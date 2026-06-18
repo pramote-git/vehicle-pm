@@ -337,9 +337,9 @@ async function screenPlan(main) {
   };
   const reloadDue = async () => renderItems(await API.callOrThrow('plan.dueSoon', { days: val('dueDays') }), 'dueTbl', true);
   const reloadList = async () => renderItems(await API.callOrThrow('plan.list', { vehicleId: val('plVeh'), status: val('plStatus') }), 'plTbl', false);
-  const reloadAll = async () => { await loadVehicles(true); await reloadDue(); await reloadList(); };
+  const reloadAll = async () => { await loadVehicles(true); await Promise.all([reloadDue(), reloadList()]); };
 
-  await reloadDue(); await reloadList();
+  await Promise.all([reloadDue(), reloadList()]);
   $('#dueDays').onchange = reloadDue;
   $('#plFilter').onclick = reloadList;
   $('#plAdd').onclick = () => planForm(0, reloadAll);

@@ -7,6 +7,16 @@ const API = (() => {
   const TOKEN_KEY = 'pk_token';
   const USER_KEY = 'pk_user';
 
+  // ---- global busy indicator (แถบโหลดด้านบน) : นับ request ที่ค้างอยู่ ----
+  let _busy = 0;
+  function _setBusy(delta) {
+    _busy = Math.max(0, _busy + delta);
+    const on = _busy > 0;
+    const bar = document.getElementById('progress');
+    if (bar) bar.classList.toggle('on', on);
+    document.body.classList.toggle('busy', on);
+  }
+
   function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
   function setToken(t) { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); }
   function getUser() { try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; } }
@@ -17,21 +27,26 @@ const API = (() => {
       throw new Error('ยังไม่ได้ตั้งค่า API_URL ใน config.js');
     }
     const body = Object.assign({ action, token: getToken() }, params);
-    let res;
+    _setBusy(1);
     try {
-      res = await fetch(PK_CONFIG.API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(body),
-        redirect: 'follow'
-      });
-    } catch (e) {
-      throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้');
+      let res;
+      try {
+        res = await fetch(PK_CONFIG.API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(body),
+          redirect: 'follow'
+        });
+      } catch (e) {
+        throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้');
+      }
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch { throw new Error('คำตอบจากเซิร์ฟเวอร์ไม่ถูกต้อง'); }
+      return data;
+    } finally {
+      _setBusy(-1);
     }
-    const text = await res.text();
-    let data;
-    try { data = JSON.parse(text); } catch { throw new Error('คำตอบจากเซิร์ฟเวอร์ไม่ถูกต้อง'); }
-    return data;
   }
 
   // คืน data ตรงๆ ถ้า success=false จะ throw error message

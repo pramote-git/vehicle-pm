@@ -5,10 +5,174 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบทะเบียนรถยนต์ &amp; บำรุงรักษา</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind Play CDN (ไม่ต้อง build — เหมาะกับ static hosting อย่าง GitHub Pages) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Sarabun', 'Segoe UI', 'Tahoma', 'sans-serif'] },
+          colors: {
+            brand: {
+              50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',
+              500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- critical CSS กัน flash ตอน Tailwind ยังโหลดไม่เสร็จ -->
+  <style>
+    body{background:#f1f5f9;font-family:'Sarabun','Segoe UI',Tahoma,sans-serif;margin:0}
+    #shell,#modal-bg{display:none}
+  </style>
+
+  <!-- ธีมทั้งหมด: นิยาม class เดิมใหม่ด้วย Tailwind @apply -->
+  <style type="text/tailwindcss">
+    @layer base {
+      body { @apply bg-slate-100 text-slate-800 text-sm antialiased; }
+      a { @apply text-brand-600 no-underline; }
+      button { @apply font-[inherit] cursor-pointer; }
+      input, select, textarea {
+        @apply px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white outline-none
+               transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30;
+      }
+      input[readonly] { @apply bg-slate-50 text-slate-500; }
+      input:disabled, select:disabled, textarea:disabled { @apply bg-slate-50 text-slate-400; }
+      table { @apply border-collapse w-full text-[13px]; }
+      th, td { @apply px-3 py-2 text-left border-b border-slate-200 whitespace-nowrap; }
+      th { @apply bg-slate-50 text-slate-500 font-semibold sticky top-0 z-10; }
+      tbody tr { @apply transition-colors; }
+      tbody tr:hover { @apply bg-brand-50; }
+    }
+
+    @layer components {
+      /* progress bar ด้านบน (indeterminate) */
+      #progress { @apply fixed inset-x-0 top-0 h-[3px] z-[200] overflow-hidden opacity-0 transition-opacity duration-200 pointer-events-none; }
+      #progress.on { @apply opacity-100; }
+      #progress::before {
+        content:''; @apply absolute inset-y-0 w-1/3;
+        background:linear-gradient(90deg,transparent,#3b82f6,#22d3ee,transparent);
+        animation:pkslide 1s linear infinite;
+      }
+      @keyframes pkslide { 0%{left:-35%} 100%{left:100%} }
+      body.busy { cursor:progress; }
+
+      /* ---- login ---- */
+      #login { @apply fixed inset-0 flex items-center justify-center p-4
+               bg-gradient-to-br from-brand-900 via-brand-700 to-blue-500; }
+      #login .box { @apply bg-white p-8 rounded-2xl w-[360px] max-w-full shadow-2xl; }
+      #login h1 { @apply text-xl font-bold m-0 mb-1 text-slate-800; }
+      #login p { @apply text-slate-500 m-0 mb-5 text-[13px]; }
+      #login input { @apply w-full mb-3; }
+      #login button { @apply w-full py-3 bg-brand-600 hover:bg-brand-700 text-white border-0
+                      rounded-lg font-semibold text-[15px] transition active:scale-[.99]
+                      disabled:opacity-60 disabled:active:scale-100; }
+      #login .err { @apply text-red-600 text-[13px] min-h-[18px] mb-2; }
+
+      /* ---- shell ---- */
+      #shell { @apply min-h-screen; }
+      #shell.on { display:grid; grid-template-columns:240px 1fr; grid-template-rows:56px 1fr;
+                  grid-template-areas:"side top" "side main"; }
+      #topbar { grid-area:top; @apply bg-white/90 backdrop-blur border-b border-slate-200 flex items-center
+                justify-between px-5 sticky top-0 z-20; }
+      #topbar .title { @apply font-bold text-slate-800; }
+      #topbar .user { @apply text-slate-500 text-[13px]; }
+      #topbar .user b { @apply text-slate-800; }
+      #topbar button { @apply ml-3 bg-white border border-slate-300 px-3 py-1.5 rounded-lg
+                       hover:bg-slate-50 transition text-slate-700; }
+      #sidebar { grid-area:side; @apply text-slate-300 py-4 sticky top-0 h-screen overflow-auto;
+                 background:linear-gradient(180deg,#1e3a8a 0%,#1e40af 60%,#1d4ed8 100%); }
+      #sidebar .brand { @apply px-[18px] pb-4 font-bold text-white text-[15px] leading-tight; }
+      #sidebar .grp { @apply px-[18px] pt-2 pb-1 text-[11px] uppercase tracking-wider text-blue-300/70; }
+      #nav a { @apply flex items-center gap-2 px-[18px] py-2.5 text-slate-200 border-l-[3px] border-transparent transition; }
+      #nav a:hover { @apply bg-white/10 text-white; }
+      #nav a.active { @apply bg-white/15 text-white font-semibold; border-left-color:#60a5fa; }
+      #main { grid-area:main; @apply p-5 overflow-auto; }
+
+      /* ---- generic ---- */
+      .cards { @apply grid gap-3 mb-4; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); }
+      .card { @apply bg-white border border-slate-200 rounded-xl px-4 py-3.5 shadow-sm transition hover:shadow-md hover:-translate-y-0.5; }
+      .card .label { @apply text-slate-500 text-xs; }
+      .card .val { @apply text-[22px] font-bold mt-1 text-slate-800; }
+      .filters { @apply flex flex-wrap gap-2.5 items-end mb-3.5; }
+      .filters .f { @apply flex flex-col gap-1; }
+      .filters label { @apply text-xs text-slate-500; }
+
+      .btn { @apply inline-flex items-center justify-center gap-1 px-3.5 py-2 border-0 rounded-lg
+             bg-brand-600 text-white font-semibold shadow-sm transition
+             hover:bg-brand-700 active:scale-[.98]
+             disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100; }
+      .btn.sm { @apply px-2.5 py-1 text-[13px] shadow-none; }
+      .btn.ghost { @apply bg-white text-slate-700 border border-slate-300 shadow-none hover:bg-slate-50; }
+      .btn.ok { @apply bg-emerald-600 hover:bg-emerald-700; }
+      .btn.warn { @apply bg-amber-600 hover:bg-amber-700; }
+      .btn.danger { @apply bg-red-600 hover:bg-red-700; }
+
+      .panel { @apply bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden; }
+      .panel .head { @apply px-4 py-3 border-b border-slate-200 flex justify-between items-center; }
+      .panel .head h3 { @apply m-0 text-[15px] font-semibold text-slate-700; }
+      .tbl-wrap { @apply overflow-auto; }
+
+      .badge { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold; }
+      .badge.gray { @apply bg-slate-100 text-slate-700; }
+      .badge.green { @apply bg-emerald-100 text-emerald-800; }
+      .badge.yellow { @apply bg-amber-100 text-amber-800; }
+      .badge.red { @apply bg-red-100 text-red-800; }
+      .badge.blue { @apply bg-blue-100 text-blue-800; }
+      .empty { @apply py-8 text-center text-slate-400; }
+      .right { @apply text-right; }
+
+      /* ---- modal ---- */
+      #modal-bg { @apply fixed inset-0 bg-slate-900/50 items-start justify-center z-50 p-4 sm:p-8 overflow-auto; backdrop-filter:blur(2px); }
+      #modal-bg.on { @apply flex; }
+      .modal { @apply bg-white rounded-2xl w-[760px] max-w-full shadow-2xl; animation:pkpop .18s ease; }
+      .modal.wide { @apply w-[1000px]; }
+      @keyframes pkpop { from{opacity:0;transform:translateY(10px) scale(.99)} to{opacity:1;transform:none} }
+      .modal .mhead { @apply px-5 py-3.5 border-b border-slate-200 flex justify-between items-center; }
+      .modal .mhead h3 { @apply m-0 text-base font-semibold text-slate-800; }
+      .modal .mhead .x { @apply bg-transparent border-0 text-[22px] text-slate-400 leading-none hover:text-slate-700; }
+      .modal .mbody { @apply p-5 max-h-[72vh] overflow-auto; }
+      .modal .mfoot { @apply px-5 py-3 border-t border-slate-200 flex justify-end gap-2; }
+      .formgrid { @apply grid gap-3; grid-template-columns:repeat(2,1fr); }
+      .formgrid .full { grid-column:1/-1; }
+      .field { @apply flex flex-col gap-1; }
+      .field label { @apply text-xs text-slate-500; }
+      .field label .auto { @apply text-brand-600 font-semibold; }
+      .section { @apply mt-1.5 border-t border-dashed border-slate-300 pt-3; }
+      .section h4 { @apply m-0 mb-2.5 text-[13px] text-brand-600 font-semibold; }
+
+      /* ---- toast ---- */
+      #toast { @apply fixed bottom-5 right-5 z-[100] flex flex-col gap-2; }
+      #toast .t { @apply bg-slate-900 text-white px-4 py-2.5 rounded-lg shadow-lg text-[13px] max-w-[320px]; animation:pktoast .25s ease; }
+      #toast .t.ok { @apply bg-emerald-600; }
+      #toast .t.err { @apply bg-red-600; }
+      @keyframes pktoast { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+      /* ---- mileage grid ---- */
+      .mgrid { @apply grid gap-2; grid-template-columns:repeat(7,1fr); }
+      .mgrid .cell { @apply border border-slate-200 rounded-lg p-1.5 transition hover:border-brand-400; }
+      .mgrid .cell .d { @apply text-[11px] text-slate-500; }
+      .mgrid .cell input { @apply w-full p-1 text-[13px]; }
+      .mgrid .cell.weekend { @apply bg-slate-50; }
+    }
+
+    @media (max-width:820px) {
+      #shell.on { grid-template-columns:1fr; grid-template-areas:"top" "main"; }
+      #sidebar { display:none; }
+      .formgrid { grid-template-columns:1fr; }
+      .mgrid { grid-template-columns:repeat(4,1fr); }
+    }
+  </style>
 </head>
 <body>
+  <div id="progress"></div>
+
   <!-- login -->
   <div id="login">
     <form class="box" id="loginForm">
@@ -24,7 +188,7 @@
   <!-- app shell -->
   <div id="shell">
     <aside id="sidebar">
-      <div class="brand">🚗 ระบบรถยนต์<br><span style="font-weight:400;font-size:12px;color:#93a5c4">บำรุงรักษาเชิงป้องกัน</span></div>
+      <div class="brand">🚗 ระบบรถยนต์<br><span style="font-weight:400;font-size:12px;color:#bfdbfe">บำรุงรักษาเชิงป้องกัน</span></div>
       <div class="grp">เมนูรถยนต์</div>
       <nav id="nav"></nav>
     </aside>
