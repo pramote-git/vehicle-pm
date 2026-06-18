@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบทะเบียนรถยนต์ &amp; บำรุงรักษา</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- login -->
+  <div id="login">
+    <form class="box" id="loginForm">
+      <h1>เข้าสู่ระบบ</h1>
+      <p>ระบบทะเบียนรถยนต์ &amp; บำรุงรักษาเชิงป้องกัน</p>
+      <div class="err" id="loginErr"></div>
+      <input id="empId" placeholder="รหัสผู้ใช้ (เช่น admin)" autocomplete="username">
+      <input id="password" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
+      <button type="submit">เข้าสู่ระบบ</button>
+    </form>
+  </div>
+
+  <!-- app shell -->
+  <div id="shell">
+    <aside id="sidebar">
+      <div class="brand">🚗 ระบบรถยนต์<br><span style="font-weight:400;font-size:12px;color:#93a5c4">บำรุงรักษาเชิงป้องกัน</span></div>
+      <div class="grp">เมนูรถยนต์</div>
+      <nav id="nav"></nav>
+    </aside>
+    <header id="topbar">
+      <div class="title" id="pageTitle">—</div>
+      <div>
+        <span class="user">ผู้ใช้: <b id="whoami"></b></span>
+        <button id="logoutBtn">ออกจากระบบ</button>
+      </div>
+    </header>
+    <main id="main"></main>
+  </div>
+
+  <!-- modal -->
+  <div id="modal-bg"><div class="modal" id="modal"></div></div>
+  <div id="toast"></div>
+
+  <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
