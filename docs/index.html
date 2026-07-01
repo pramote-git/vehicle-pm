@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind Play CDN (ไม่ต้อง build — เหมาะกับ static hosting อย่าง GitHub Pages) -->
+  <!-- Tailwind Play CDN (ไม่ต้อง build — เหมาะกับ static hosting) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -16,149 +16,153 @@
         extend: {
           fontFamily: { sans: ['Sarabun', 'Segoe UI', 'Tahoma', 'sans-serif'] },
           colors: {
-            brand: {
-              50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',
-              500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a'
-            }
+            navy: { 950: '#080d1a', 900: '#0b1220', 800: '#0f172a', 700: '#1e293b', 600: '#334155' },
+            brand: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a' }
           }
         }
       }
     };
   </script>
 
-  <!-- critical CSS กัน flash ตอน Tailwind ยังโหลดไม่เสร็จ -->
   <style>
-    body{background:#f1f5f9;font-family:'Sarabun','Segoe UI',Tahoma,sans-serif;margin:0}
+    body{background:#eef2f6;font-family:'Sarabun','Segoe UI',Tahoma,sans-serif;margin:0}
     #shell,#modal-bg{display:none}
   </style>
 
-  <!-- ธีมทั้งหมด: นิยาม class เดิมใหม่ด้วย Tailwind @apply -->
   <style type="text/tailwindcss">
     @layer base {
       body { @apply bg-slate-100 text-slate-800 text-sm antialiased; }
-      a { @apply text-brand-600 no-underline; }
+      a { @apply text-brand-700 no-underline; }
       button { @apply font-[inherit] cursor-pointer; }
       input, select, textarea {
-        @apply px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white outline-none
-               transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30;
+        @apply px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-800 outline-none
+               transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25;
       }
-      input[readonly] { @apply bg-slate-50 text-slate-500; }
-      input:disabled, select:disabled, textarea:disabled { @apply bg-slate-50 text-slate-400; }
+      input[readonly] { @apply bg-slate-100 text-slate-500; }
+      input:disabled, select:disabled, textarea:disabled { @apply bg-slate-100 text-slate-400; }
       table { @apply border-collapse w-full text-[13px]; }
-      th, td { @apply px-3 py-2 text-left border-b border-slate-200 whitespace-nowrap; }
-      th { @apply bg-slate-50 text-slate-500 font-semibold sticky top-0 z-10; }
+      th, td { @apply px-3.5 py-2.5 text-left border-b border-slate-100 whitespace-nowrap; }
+      th { @apply bg-slate-50 text-slate-500 font-semibold uppercase text-[11px] tracking-wider sticky top-0 z-10 border-b-slate-200; }
       tbody tr { @apply transition-colors; }
-      tbody tr:hover { @apply bg-brand-50; }
+      tbody tr:hover { @apply bg-slate-50; }
     }
 
     @layer components {
-      /* progress bar ด้านบน (indeterminate) */
+      /* progress bar ด้านบน */
       #progress { @apply fixed inset-x-0 top-0 h-[3px] z-[200] overflow-hidden opacity-0 transition-opacity duration-200 pointer-events-none; }
       #progress.on { @apply opacity-100; }
-      #progress::before {
-        content:''; @apply absolute inset-y-0 w-1/3;
-        background:linear-gradient(90deg,transparent,#3b82f6,#22d3ee,transparent);
-        animation:pkslide 1s linear infinite;
-      }
+      #progress::before { content:''; @apply absolute inset-y-0 w-1/3; background:linear-gradient(90deg,transparent,#2563eb,#60a5fa,transparent); animation:pkslide 1s linear infinite; }
       @keyframes pkslide { 0%{left:-35%} 100%{left:100%} }
       body.busy { cursor:progress; }
 
-      /* ---- login ---- */
-      #login { @apply fixed inset-0 flex items-center justify-center p-4
-               bg-gradient-to-br from-brand-900 via-brand-700 to-blue-500; }
-      #login .box { @apply bg-white p-8 rounded-2xl w-[360px] max-w-full shadow-2xl; }
-      #login h1 { @apply text-xl font-bold m-0 mb-1 text-slate-800; }
-      #login p { @apply text-slate-500 m-0 mb-5 text-[13px]; }
-      #login input { @apply w-full mb-3; }
-      #login button { @apply w-full py-3 bg-brand-600 hover:bg-brand-700 text-white border-0
-                      rounded-lg font-semibold text-[15px] transition active:scale-[.99]
-                      disabled:opacity-60 disabled:active:scale-100; }
+      /* ---------- login (split panel) ---------- */
+      #login { @apply fixed inset-0 flex items-center justify-center p-4; background:radial-gradient(1200px 600px at 20% -10%,#1e293b,#080d1a 70%); }
+      #login .box { @apply bg-white rounded-2xl w-[820px] max-w-full overflow-hidden grid shadow-2xl; grid-template-columns:1fr 1fr; }
+      #login .lbrand { @apply hidden sm:flex flex-col justify-between p-9 text-slate-100 relative; background:linear-gradient(160deg,#1e293b,#0b1220); }
+      #login .lbrand .emblem { @apply w-12 h-12 rounded-xl grid place-items-center text-2xl bg-white/10 ring-1 ring-white/15; }
+      #login .lbrand h2 { @apply text-[22px] font-bold mt-6 mb-2 leading-snug; }
+      #login .lbrand p { @apply text-[13px] text-slate-300 leading-relaxed m-0; }
+      #login .lbrand .foot { @apply text-[11px] text-slate-400/80 tracking-wide; }
+      #login form { @apply p-9 flex flex-col justify-center; }
+      #login form h1 { @apply text-xl font-bold m-0 mb-1 text-slate-800; }
+      #login form .sub { @apply text-slate-500 text-[13px] m-0 mb-6; }
+      #login label { @apply text-xs font-semibold text-slate-500 mb-1 block; }
+      #login input { @apply w-full mb-4; }
+      #login button { @apply w-full py-3 mt-1 bg-navy-800 hover:bg-navy-700 text-white border-0 rounded-lg font-semibold text-[15px] transition active:scale-[.99] disabled:opacity-60 disabled:active:scale-100 shadow-sm; }
       #login .err { @apply text-red-600 text-[13px] min-h-[18px] mb-2; }
 
-      /* ---- shell ---- */
+      /* ---------- shell ---------- */
       #shell { @apply min-h-screen; }
-      #shell.on { display:grid; grid-template-columns:240px 1fr; grid-template-rows:56px 1fr;
-                  grid-template-areas:"side top" "side main"; }
-      #topbar { grid-area:top; @apply bg-white/90 backdrop-blur border-b border-slate-200 flex items-center
-                justify-between px-5 sticky top-0 z-20; }
-      #topbar .title { @apply font-bold text-slate-800; }
-      #topbar .user { @apply text-slate-500 text-[13px]; }
-      #topbar .user b { @apply text-slate-800; }
-      #topbar button { @apply ml-3 bg-white border border-slate-300 px-3 py-1.5 rounded-lg
-                       hover:bg-slate-50 transition text-slate-700; }
-      #sidebar { grid-area:side; @apply text-slate-300 py-4 sticky top-0 h-screen overflow-auto;
-                 background:linear-gradient(180deg,#1e3a8a 0%,#1e40af 60%,#1d4ed8 100%); }
-      #sidebar .brand { @apply px-[18px] pb-4 font-bold text-white text-[15px] leading-tight; }
-      #sidebar .grp { @apply px-[18px] pt-2 pb-1 text-[11px] uppercase tracking-wider text-blue-300/70; }
-      #nav a { @apply flex items-center gap-2 px-[18px] py-2.5 text-slate-200 border-l-[3px] border-transparent transition; }
-      #nav a:hover { @apply bg-white/10 text-white; }
-      #nav a.active { @apply bg-white/15 text-white font-semibold; border-left-color:#60a5fa; }
-      #main { grid-area:main; @apply p-5 overflow-auto; }
+      #shell.on { display:grid; grid-template-columns:248px 1fr; grid-template-rows:60px 1fr; grid-template-areas:"side top" "side main"; }
+      #topbar { grid-area:top; @apply bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-20; box-shadow:0 1px 3px rgba(15,23,42,.04); }
+      #topbar .title { @apply font-bold text-slate-800 text-[15px]; }
+      #topbar .right { @apply flex items-center gap-3; }
+      #topbar .chip { @apply flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full bg-slate-50 border border-slate-200; }
+      #topbar .chip .avatar { @apply w-8 h-8 rounded-full grid place-items-center bg-navy-800 text-white text-[13px] font-semibold; }
+      #topbar .chip .user { @apply text-[13px] text-slate-600 leading-tight pr-1; }
+      #topbar .chip .user b { @apply text-slate-800 block text-[13px] font-semibold; }
+      #topbar button#logoutBtn { @apply bg-white border border-slate-300 text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-50 hover:text-slate-800 transition text-[13px]; }
 
-      /* ---- generic ---- */
-      .cards { @apply grid gap-3 mb-4; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); }
-      .card { @apply bg-white border border-slate-200 rounded-xl px-4 py-3.5 shadow-sm transition hover:shadow-md hover:-translate-y-0.5; }
-      .card .label { @apply text-slate-500 text-xs; }
-      .card .val { @apply text-[22px] font-bold mt-1 text-slate-800; }
-      .filters { @apply flex flex-wrap gap-2.5 items-end mb-3.5; }
-      .filters .f { @apply flex flex-col gap-1; }
-      .filters label { @apply text-xs text-slate-500; }
+      #sidebar { grid-area:side; @apply text-slate-300 flex flex-col sticky top-0 h-screen overflow-auto; background:linear-gradient(180deg,#1e293b,#0b1220); }
+      #sidebar .brand { @apply flex items-center gap-3 px-5 py-4 border-b border-white/10; }
+      #sidebar .brand .logo { @apply w-10 h-10 rounded-xl grid place-items-center text-xl bg-white/10 ring-1 ring-white/15 shrink-0; }
+      #sidebar .brand .btext { @apply flex flex-col leading-tight; }
+      #sidebar .brand .btitle { @apply text-white font-bold text-[15px]; }
+      #sidebar .brand .bsub { @apply text-[11px] text-slate-400; }
+      #sidebar .grp { @apply px-5 pt-5 pb-2 text-[10px] uppercase tracking-[.12em] text-slate-500 font-semibold; }
+      #nav { @apply px-3 pb-4 flex flex-col gap-0.5; }
+      #nav a { @apply flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-slate-300 text-[13.5px] font-medium border-l-2 border-transparent transition; }
+      #nav a:hover { @apply bg-white/5 text-white; }
+      #nav a.active { @apply bg-brand-600/15 text-white; border-left-color:#60a5fa; }
+      #main { grid-area:main; @apply p-6 overflow-auto; }
 
-      .btn { @apply inline-flex items-center justify-center gap-1 px-3.5 py-2 border-0 rounded-lg
-             bg-brand-600 text-white font-semibold shadow-sm transition
-             hover:bg-brand-700 active:scale-[.98]
-             disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100; }
-      .btn.sm { @apply px-2.5 py-1 text-[13px] shadow-none; }
-      .btn.ghost { @apply bg-white text-slate-700 border border-slate-300 shadow-none hover:bg-slate-50; }
+      /* ---------- generic ---------- */
+      .cards { @apply grid gap-4 mb-5; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); }
+      .card { @apply bg-white border border-slate-200 rounded-xl px-5 py-4 shadow-sm transition hover:shadow-md relative overflow-hidden; }
+      .card::before { content:''; @apply absolute left-0 top-0 bottom-0 w-1 bg-navy-800; }
+      .card .label { @apply text-slate-500 text-[12px] font-medium uppercase tracking-wide; }
+      .card .val { @apply text-[26px] font-bold mt-1.5 text-navy-800 leading-none; }
+      .filters { @apply flex flex-wrap gap-3 items-end mb-4 bg-white border border-slate-200 rounded-xl p-4 shadow-sm; }
+      .filters .f { @apply flex flex-col gap-1.5; }
+      .filters label { @apply text-[11px] font-semibold text-slate-500 uppercase tracking-wide; }
+
+      .btn { @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 border-0 rounded-lg bg-navy-800 text-white font-semibold text-[13.5px] shadow-sm transition hover:bg-navy-700 active:scale-[.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100; }
+      .btn.sm { @apply px-2.5 py-1 text-[12.5px] shadow-none rounded-md; }
+      .btn.ghost { @apply bg-white text-slate-700 border border-slate-300 shadow-none hover:bg-slate-50 hover:border-slate-400; }
       .btn.ok { @apply bg-emerald-600 hover:bg-emerald-700; }
-      .btn.warn { @apply bg-amber-600 hover:bg-amber-700; }
-      .btn.danger { @apply bg-red-600 hover:bg-red-700; }
+      .btn.warn { @apply bg-amber-500 hover:bg-amber-600; }
+      .btn.danger { @apply bg-white text-red-600 border border-red-200 hover:bg-red-50 shadow-none; }
 
       .panel { @apply bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden; }
-      .panel .head { @apply px-4 py-3 border-b border-slate-200 flex justify-between items-center; }
-      .panel .head h3 { @apply m-0 text-[15px] font-semibold text-slate-700; }
+      .panel .head { @apply px-5 py-3.5 border-b border-slate-200 flex justify-between items-center bg-slate-50/60; }
+      .panel .head h3 { @apply m-0 text-[14px] font-bold text-navy-700 flex items-center gap-2; }
       .tbl-wrap { @apply overflow-auto; }
 
-      .badge { @apply inline-block px-2 py-0.5 rounded-full text-xs font-semibold; }
-      .badge.gray { @apply bg-slate-100 text-slate-700; }
-      .badge.green { @apply bg-emerald-100 text-emerald-800; }
-      .badge.yellow { @apply bg-amber-100 text-amber-800; }
-      .badge.red { @apply bg-red-100 text-red-800; }
-      .badge.blue { @apply bg-blue-100 text-blue-800; }
-      .empty { @apply py-8 text-center text-slate-400; }
+      .badge { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-[11.5px] font-semibold ring-1 ring-inset; }
+      .badge.gray { @apply bg-slate-50 text-slate-600 ring-slate-200; }
+      .badge.green { @apply bg-emerald-50 text-emerald-700 ring-emerald-200; }
+      .badge.yellow { @apply bg-amber-50 text-amber-700 ring-amber-200; }
+      .badge.red { @apply bg-red-50 text-red-700 ring-red-200; }
+      .badge.blue { @apply bg-brand-50 text-brand-700 ring-brand-200; }
+      .empty { @apply py-10 text-center text-slate-400; }
       .right { @apply text-right; }
+      .ic { @apply inline-block shrink-0; width:16px; height:16px; vertical-align:-2px; }
+      #nav a .ic { width:18px; height:18px; }
+      .card .cwrap { @apply flex items-center gap-3.5; }
+      .card .kico { @apply w-10 h-10 rounded-lg grid place-items-center bg-navy-800/5 text-navy-700 shrink-0; }
+      .card .kico .ic { width:20px; height:20px; }
 
-      /* ---- modal ---- */
-      #modal-bg { @apply fixed inset-0 bg-slate-900/50 items-start justify-center z-50 p-4 sm:p-8 overflow-auto; backdrop-filter:blur(2px); }
+      /* ---------- modal ---------- */
+      #modal-bg { @apply fixed inset-0 items-start justify-center z-50 p-4 sm:p-8 overflow-auto; background:rgba(8,13,26,.55); backdrop-filter:blur(3px); }
       #modal-bg.on { @apply flex; }
-      .modal { @apply bg-white rounded-2xl w-[760px] max-w-full shadow-2xl; animation:pkpop .18s ease; }
+      .modal { @apply bg-white rounded-2xl w-[780px] max-w-full shadow-2xl; animation:pkpop .18s ease; }
       .modal.wide { @apply w-[1000px]; }
       @keyframes pkpop { from{opacity:0;transform:translateY(10px) scale(.99)} to{opacity:1;transform:none} }
-      .modal .mhead { @apply px-5 py-3.5 border-b border-slate-200 flex justify-between items-center; }
-      .modal .mhead h3 { @apply m-0 text-base font-semibold text-slate-800; }
+      .modal .mhead { @apply px-6 py-4 border-b border-slate-200 flex justify-between items-center; }
+      .modal .mhead h3 { @apply m-0 text-[15px] font-bold text-navy-800; }
       .modal .mhead .x { @apply bg-transparent border-0 text-[22px] text-slate-400 leading-none hover:text-slate-700; }
-      .modal .mbody { @apply p-5 max-h-[72vh] overflow-auto; }
-      .modal .mfoot { @apply px-5 py-3 border-t border-slate-200 flex justify-end gap-2; }
-      .formgrid { @apply grid gap-3; grid-template-columns:repeat(2,1fr); }
+      .modal .mbody { @apply p-6 max-h-[72vh] overflow-auto; }
+      .modal .mfoot { @apply px-6 py-4 border-t border-slate-200 flex justify-end gap-2 bg-slate-50/60; }
+      .formgrid { @apply grid gap-4; grid-template-columns:repeat(2,1fr); }
       .formgrid .full { grid-column:1/-1; }
-      .field { @apply flex flex-col gap-1; }
-      .field label { @apply text-xs text-slate-500; }
-      .field label .auto { @apply text-brand-600 font-semibold; }
-      .section { @apply mt-1.5 border-t border-dashed border-slate-300 pt-3; }
-      .section h4 { @apply m-0 mb-2.5 text-[13px] text-brand-600 font-semibold; }
+      .field { @apply flex flex-col gap-1.5; }
+      .field label { @apply text-[11px] font-semibold text-slate-500 uppercase tracking-wide; }
+      .field label .auto { @apply text-brand-600 normal-case tracking-normal; }
+      .section { @apply mt-2 border-t border-slate-200 pt-4; }
+      .section h4 { @apply m-0 mb-3 text-[12px] font-bold text-navy-700 uppercase tracking-wide; }
 
-      /* ---- toast ---- */
-      #toast { @apply fixed bottom-5 right-5 z-[100] flex flex-col gap-2; }
-      #toast .t { @apply bg-slate-900 text-white px-4 py-2.5 rounded-lg shadow-lg text-[13px] max-w-[320px]; animation:pktoast .25s ease; }
-      #toast .t.ok { @apply bg-emerald-600; }
-      #toast .t.err { @apply bg-red-600; }
+      /* ---------- toast ---------- */
+      #toast { @apply fixed bottom-6 right-6 z-[100] flex flex-col gap-2; }
+      #toast .t { @apply bg-navy-800 text-white px-4 py-3 rounded-lg shadow-xl text-[13px] max-w-[340px] ring-1 ring-white/10; animation:pktoast .25s ease; }
+      #toast .t.ok { @apply bg-emerald-600 ring-emerald-400/30; }
+      #toast .t.err { @apply bg-red-600 ring-red-400/30; }
       @keyframes pktoast { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
 
-      /* ---- mileage grid ---- */
+      /* ---------- mileage grid ---------- */
       .mgrid { @apply grid gap-2; grid-template-columns:repeat(7,1fr); }
-      .mgrid .cell { @apply border border-slate-200 rounded-lg p-1.5 transition hover:border-brand-400; }
-      .mgrid .cell .d { @apply text-[11px] text-slate-500; }
-      .mgrid .cell input { @apply w-full p-1 text-[13px]; }
+      .mgrid .cell { @apply border border-slate-200 rounded-lg p-2 transition hover:border-brand-400 bg-white; }
+      .mgrid .cell .d { @apply text-[11px] text-slate-500 font-medium mb-1; }
+      .mgrid .cell input { @apply w-full p-1.5 text-[13px]; }
       .mgrid .cell.weekend { @apply bg-slate-50; }
     }
 
@@ -167,6 +171,7 @@
       #sidebar { display:none; }
       .formgrid { grid-template-columns:1fr; }
       .mgrid { grid-template-columns:repeat(4,1fr); }
+      #login .box { grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -175,27 +180,45 @@
 
   <!-- login -->
   <div id="login">
-    <form class="box" id="loginForm">
-      <h1>เข้าสู่ระบบ</h1>
-      <p>ระบบทะเบียนรถยนต์ &amp; บำรุงรักษาเชิงป้องกัน</p>
-      <div class="err" id="loginErr"></div>
-      <input id="empId" placeholder="รหัสผู้ใช้ (เช่น admin)" autocomplete="username">
-      <input id="password" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
-      <button type="submit">เข้าสู่ระบบ</button>
-    </form>
+    <div class="box">
+      <div class="lbrand">
+        <div>
+          <div class="emblem"><svg class="ic" style="width:26px;height:26px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></div>
+          <h2>ระบบทะเบียนรถยนต์<br>&amp; บำรุงรักษาเชิงป้องกัน</h2>
+          <p>บริหารจัดการทะเบียนรถ ประกัน พ.ร.บ. ตรวจสภาพ แผนบำรุงรักษา แจ้งซ่อม และเลขไมล์ ในระบบเดียว</p>
+        </div>
+        <div class="foot">VEHICLE PM · PREVENTIVE MAINTENANCE SYSTEM</div>
+      </div>
+      <form id="loginForm">
+        <h1>เข้าสู่ระบบ</h1>
+        <p class="sub">กรุณาลงชื่อเข้าใช้เพื่อดำเนินการต่อ</p>
+        <div class="err" id="loginErr"></div>
+        <label for="empId">รหัสผู้ใช้</label>
+        <input id="empId" placeholder="เช่น admin" autocomplete="username">
+        <label for="password">รหัสผ่าน</label>
+        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+        <button type="submit">เข้าสู่ระบบ</button>
+      </form>
+    </div>
   </div>
 
   <!-- app shell -->
   <div id="shell">
     <aside id="sidebar">
-      <div class="brand">🚗 ระบบรถยนต์<br><span style="font-weight:400;font-size:12px;color:#bfdbfe">บำรุงรักษาเชิงป้องกัน</span></div>
-      <div class="grp">เมนูรถยนต์</div>
+      <div class="brand">
+        <div class="logo text-white"><svg class="ic" style="width:22px;height:22px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></div>
+        <div class="btext"><span class="btitle">ระบบรถยนต์</span><span class="bsub">บำรุงรักษาเชิงป้องกัน</span></div>
+      </div>
+      <div class="grp">เมนูหลัก</div>
       <nav id="nav"></nav>
     </aside>
     <header id="topbar">
       <div class="title" id="pageTitle">—</div>
-      <div>
-        <span class="user">ผู้ใช้: <b id="whoami"></b></span>
+      <div class="right">
+        <div class="chip">
+          <div class="avatar"><svg class="ic" style="width:17px;height:17px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="user"><b id="whoami"></b></div>
+        </div>
         <button id="logoutBtn">ออกจากระบบ</button>
       </div>
     </header>

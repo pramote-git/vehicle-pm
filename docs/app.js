@@ -7,6 +7,34 @@
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 
+/* ---------- line icons (SVG, สืบสีจาก currentColor) ---------- */
+const ICONS = {
+  car: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+  calendar: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/>',
+  wrench: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  clipboard: '<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',
+  history: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
+  gauge: '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/>',
+  filter: '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  list: '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',
+  chart: '<path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12" y="7" width="3" height="10" rx="1"/><rect x="17" y="13" width="3" height="4" rx="1"/>',
+  grid: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  play: '<path d="m5 3 14 9-14 9V3z"/>',
+  circleCheck: '<circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/>',
+  ban: '<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
+  paperclip: '<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>'
+};
+function icon(name, w) {
+  const s = w || 16;
+  return `<svg class="ic" style="width:${s}px;height:${s}px" viewBox="0 0 24 24" fill="none" stroke="currentColor" `
+    + `stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
+}
+
 function escapeHtml(v) {
   if (v === null || v === undefined) return '';
   return String(v).replace(/[&<>"']/g, c =>
@@ -83,12 +111,12 @@ function vehicleSelect(id, selected, opts = '') {
  * MENUS
  * ============================================================ */
 const MENUS = [
-  { key: 'pk_vehicle_registry', label: '🚙 ทะเบียนประวัติรถยนต์', render: screenVehicle },
-  { key: 'pk_vehicle_plan',     label: '🔧 แผนบำรุงรักษา',       render: screenPlan },
-  { key: 'pk_vehicle_repair',   label: '🛠️ แจ้งซ่อมรถยนต์',      render: screenRepair },
-  { key: 'pk_vehicle_log',      label: '📋 บันทึกการซ่อม/บำรุง',  render: screenLog },
-  { key: 'pk_vehicle_history',  label: '📚 ประวัติการซ่อม',       render: screenHistory },
-  { key: 'pk_vehicle_mileage',  label: '🔢 บันทึกเลขไมล์',        render: screenMileage }
+  { key: 'pk_vehicle_registry', icon: 'car',       label: 'ทะเบียนประวัติรถยนต์', render: screenVehicle },
+  { key: 'pk_vehicle_plan',     icon: 'calendar',  label: 'แผนบำรุงรักษา',       render: screenPlan },
+  { key: 'pk_vehicle_repair',   icon: 'wrench',    label: 'แจ้งซ่อมรถยนต์',      render: screenRepair },
+  { key: 'pk_vehicle_log',      icon: 'clipboard', label: 'บันทึกการซ่อม/บำรุง',  render: screenLog },
+  { key: 'pk_vehicle_history',  icon: 'history',   label: 'ประวัติการซ่อม',       render: screenHistory },
+  { key: 'pk_vehicle_mileage',  icon: 'gauge',     label: 'บันทึกเลขไมล์',        render: screenMileage }
 ];
 function canSee(key) {
   const u = API.getUser();
@@ -121,45 +149,51 @@ function enterApp(user) {
   // build nav
   const visible = MENUS.filter(m => canSee(m.key));
   $('#nav').innerHTML = visible.map(m =>
-    `<a href="#" data-key="${m.key}">${m.label}</a>`).join('') ||
+    `<a href="#" data-key="${m.key}">${icon(m.icon, 18)}<span>${m.label}</span></a>`).join('') ||
     '<div style="padding:12px 18px;color:#93a5c4">ไม่มีสิทธิ์เข้าถึงเมนูใด</div>';
   $$('#nav a').forEach(a => a.onclick = e => { e.preventDefault(); setScreen(a.dataset.key); });
   if (visible.length) setScreen(visible[0].key);
 }
 
 let _activeKey = null;
+let _renderSeq = 0;
+// true ถ้าการ render นี้ไม่ใช่หน้าปัจจุบันแล้ว (ผู้ใช้สลับเมนูไปแล้ว) — กันเขียนทับ/เขียนลง element ที่ถูกลบ
+function stale(seq) { return seq !== _renderSeq; }
 function setScreen(key) {
   _activeKey = key;
+  const seq = ++_renderSeq;
   $$('#nav a').forEach(a => a.classList.toggle('active', a.dataset.key === key));
   const menu = MENUS.find(m => m.key === key);
-  $('#pageTitle').textContent = menu.label.replace(/^[^\s]+\s/, '');
+  $('#pageTitle').textContent = menu.label;
   const main = $('#main');
   main.innerHTML = '<div class="empty">กำลังโหลด…</div>';
-  menu.render(main).catch(err => { main.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`; });
+  menu.render(main, seq).catch(err => { if (!stale(seq)) main.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`; });
 }
 
 /* ============================================================
  * เมนู 1 — ทะเบียนรถยนต์
  * ============================================================ */
-async function screenVehicle(main) {
+async function screenVehicle(main, seq) {
   const rows = await API.callOrThrow('vehicle.list', { search: '', vehicleType: '' });
+  if (stale(seq)) return;
   const types = [...new Set(rows.map(r => r.VehicleType).filter(Boolean))];
   main.innerHTML = `
     <div class="cards">
-      <div class="card"><div class="label">จำนวนรถทั้งหมด</div><div class="val">${rows.length}</div></div>
-      <div class="card"><div class="label">ใช้งานปกติ</div><div class="val">${rows.filter(r => r.VehicleStatus !== 'ยกเลิก').length}</div></div>
-      <div class="card"><div class="label">ยกเลิกใช้งาน</div><div class="val">${rows.filter(r => r.VehicleStatus === 'ยกเลิก').length}</div></div>
+      <div class="card"><div class="cwrap"><div class="kico">${icon('car', 19)}</div><div><div class="label">จำนวนรถทั้งหมด</div><div class="val">${rows.length}</div></div></div></div>
+      <div class="card"><div class="cwrap"><div class="kico">${icon('circleCheck', 19)}</div><div><div class="label">ใช้งานปกติ</div><div class="val">${rows.filter(r => r.VehicleStatus !== 'ยกเลิก').length}</div></div></div></div>
+      <div class="card"><div class="cwrap"><div class="kico">${icon('ban', 19)}</div><div><div class="label">ยกเลิกใช้งาน</div><div class="val">${rows.filter(r => r.VehicleStatus === 'ยกเลิก').length}</div></div></div></div>
     </div>
     <div class="filters">
       <div class="f"><label>ค้นหา</label><input id="vSearch" placeholder="ทะเบียน/ยี่ห้อ/ผู้รับผิดชอบ"></div>
       <div class="f"><label>ประเภท</label><select id="vType"><option value="">ทั้งหมด</option>${types.map(t => `<option>${escapeHtml(t)}</option>`).join('')}</select></div>
-      <button class="btn ghost" id="vFilter">กรอง</button>
+      <button class="btn ghost" id="vFilter">${icon('filter')}กรอง</button>
       <div style="flex:1"></div>
-      <button class="btn" id="vAdd">+ เพิ่มรถ</button>
+      <button class="btn" id="vAdd">${icon('plus')}เพิ่มรถ</button>
     </div>
     <div class="panel"><div class="tbl-wrap"><table id="vTbl"></table></div></div>`;
 
   const draw = list => {
+    if (stale(seq)) return;
     $('#vTbl').innerHTML = `
       <thead><tr>
         <th>#</th><th>ทะเบียน</th><th>ประเภท</th><th>ยี่ห้อ/รุ่น</th><th>อายุ(ปี)</th>
@@ -180,8 +214,8 @@ async function screenVehicle(main) {
           <td>${fmtDate(r.NextInspectDate)}</td>
           <td>${statusBadge(r.VehicleStatus)}</td>
           <td>
-            <button class="btn sm ghost" data-edit="${r.VehicleID}">แก้ไข</button>
-            <button class="btn sm danger" data-del="${r.VehicleID}">ลบ</button>
+            <button class="btn sm ghost" data-edit="${r.VehicleID}">${icon('pencil')}แก้ไข</button>
+            <button class="btn sm danger" data-del="${r.VehicleID}">${icon('trash')}ลบ</button>
           </td>
         </tr>`).join('') || `<tr><td colspan="12" class="empty">ไม่มีข้อมูล</td></tr>`}
       </tbody>`;
@@ -249,7 +283,7 @@ async function vehicleForm(id, refresh) {
       ${field('หมายเหตุ', `<textarea id="Remark" rows="2">${escapeHtml(d.Remark || '')}</textarea>`, true)}
     </div>`;
   openModal(Number(id) ? 'แก้ไขข้อมูลรถ' : 'เพิ่มรถใหม่', body,
-    `<button class="btn ghost" data-close>ยกเลิก</button><button class="btn" id="vSave">บันทึก</button>`, { wide: true });
+    `<button class="btn ghost" data-close>ยกเลิก</button><button class="btn" id="vSave">${icon('check')}บันทึก</button>`, { wide: true });
 
   $('#vSave').onclick = async () => {
     const p = {
@@ -291,11 +325,12 @@ window.recalcAuto = function () {
 /* ============================================================
  * เมนู 2 — แผนบำรุงรักษา + reminder
  * ============================================================ */
-async function screenPlan(main) {
+async function screenPlan(main, seq) {
   await loadVehicles();
+  if (stale(seq)) return;
   main.innerHTML = `
     <div class="panel" style="margin-bottom:16px">
-      <div class="head"><h3>⏰ ครบกำหนดเร็วๆนี้</h3>
+      <div class="head"><h3>${icon('bell')}ครบกำหนดเร็วๆนี้</h3>
         <div><label style="font-size:12px;color:#6b7280">ภายใน</label>
           <select id="dueDays"><option>15</option><option selected>30</option><option>60</option><option>90</option></select> วัน</div>
       </div>
@@ -304,13 +339,14 @@ async function screenPlan(main) {
     <div class="filters">
       <div class="f"><label>รถ</label>${vehicleSelect('plVeh', '')}</div>
       <div class="f"><label>สถานะ</label><select id="plStatus"><option value="">ทั้งหมด</option><option>ใช้งาน</option><option>เสร็จสิ้น</option><option>ยกเลิก</option></select></div>
-      <button class="btn ghost" id="plFilter">กรอง</button>
+      <button class="btn ghost" id="plFilter">${icon('filter')}กรอง</button>
       <div style="flex:1"></div>
-      <button class="btn" id="plAdd">+ เพิ่มแผน</button>
+      <button class="btn" id="plAdd">${icon('plus')}เพิ่มแผน</button>
     </div>
-    <div class="panel"><div class="head"><h3>แผนทั้งหมด</h3></div><div class="tbl-wrap"><table id="plTbl"></table></div></div>`;
+    <div class="panel"><div class="head"><h3>${icon('list')}แผนทั้งหมด</h3></div><div class="tbl-wrap"><table id="plTbl"></table></div></div>`;
 
   const renderItems = (list, tblId, isDue) => {
+    if (stale(seq)) return;
     $('#' + tblId).innerHTML = `
       <thead><tr><th>ประเภท</th><th>งาน</th><th>ทะเบียน</th><th>กำหนดวันที่</th><th class="right">กำหนด กม.</th><th>คงเหลือ</th><th></th></tr></thead>
       <tbody>${list.map(it => {
@@ -326,8 +362,8 @@ async function screenPlan(main) {
           <td>${fmtDate(it.dueDate)}</td>
           <td class="right">${it.dueMileage !== null ? num(it.dueMileage) : '-'}</td>
           <td>${remain}</td>
-          <td><button class="btn sm" data-act='${escapeHtml(JSON.stringify(it))}'>ดำเนินการ</button>
-              ${it.kind === 'plan' && !isDue ? `<button class="btn sm danger" data-delplan="${it.planId}">ลบ</button>` : ''}</td>
+          <td><button class="btn sm" data-act='${escapeHtml(JSON.stringify(it))}'>${icon('play')}ดำเนินการ</button>
+              ${it.kind === 'plan' && !isDue ? `<button class="btn sm danger" data-delplan="${it.planId}">${icon('trash')}ลบ</button>` : ''}</td>
         </tr>`; }).join('') || `<tr><td colspan="7" class="empty">ไม่มีรายการ</td></tr>`}</tbody>`;
     $$('#' + tblId + ' [data-act]').forEach(b => b.onclick = () => planAction(JSON.parse(b.dataset.act), reloadAll));
     $$('#' + tblId + ' [data-delplan]').forEach(b => b.onclick = async () => {
@@ -362,7 +398,7 @@ async function planForm(id, refresh) {
     <div class="full" style="color:#6b7280;font-size:12px">กำหนดครั้งถัดไป (วันที่/กม.) ระบบคำนวณอัตโนมัติเมื่อบันทึก</div>
   </div>`;
   openModal(Number(id) ? 'แก้ไขแผน' : 'เพิ่มแผนบำรุงรักษา', body,
-    `<button class="btn ghost" data-close>ยกเลิก</button><button class="btn" id="plSave">บันทึก</button>`);
+    `<button class="btn ghost" data-close>ยกเลิก</button><button class="btn" id="plSave">${icon('check')}บันทึก</button>`);
   $('#plSave').onclick = async () => {
     const p = {
       PlanID: d.PlanID || 0, VehicleID: val('plfVeh'), TaskName: val('TaskName'), TaskType: val('TaskType'),
@@ -402,18 +438,20 @@ function planAction(it, refresh) {
 /* ============================================================
  * เมนู 3 — แจ้งซ่อม
  * ============================================================ */
-async function screenRepair(main) {
+async function screenRepair(main, seq) {
   await loadVehicles();
+  if (stale(seq)) return;
   main.innerHTML = `
     <div class="filters">
       <div class="f"><label>ค้นหา</label><input id="rqSearch" placeholder="เลขที่/อาการ/ทะเบียน"></div>
       <div class="f"><label>รถ</label>${vehicleSelect('rqVeh', '')}</div>
       <div class="f"><label>สถานะ</label><select id="rqStatus"><option value="">ทั้งหมด</option><option>รอดำเนินการ</option><option>กำลังซ่อม</option><option>เสร็จสิ้น</option></select></div>
-      <button class="btn ghost" id="rqFilter">กรอง</button>
-      <div style="flex:1"></div><button class="btn" id="rqAdd">+ แจ้งซ่อม</button>
+      <button class="btn ghost" id="rqFilter">${icon('filter')}กรอง</button>
+      <div style="flex:1"></div><button class="btn" id="rqAdd">${icon('plus')}แจ้งซ่อม</button>
     </div>
     <div class="panel"><div class="tbl-wrap"><table id="rqTbl"></table></div></div>`;
   const draw = list => {
+    if (stale(seq)) return;
     $('#rqTbl').innerHTML = `
       <thead><tr><th>เลขที่</th><th>วันที่แจ้ง</th><th>ทะเบียน</th><th>อาการ</th><th>ความรุนแรง</th><th>ผู้แจ้ง</th><th>สถานะ</th><th></th></tr></thead>
       <tbody>${list.map(r => `<tr>
@@ -421,8 +459,8 @@ async function screenRepair(main) {
         <td>${escapeHtml(r.LicensePlate)}</td><td>${escapeHtml((r.ProblemDescription || '').slice(0, 40))}</td>
         <td>${escapeHtml(r.Severity)}</td><td>${escapeHtml(r.ReportedByName)}</td>
         <td>${statusBadge(r.Status)}</td>
-        <td><button class="btn sm ghost" data-edit="${r.RequestID}">แก้ไข</button>
-            <button class="btn sm danger" data-del="${r.RequestID}">ลบ</button></td>
+        <td><button class="btn sm ghost" data-edit="${r.RequestID}">${icon('pencil')}แก้ไข</button>
+            <button class="btn sm danger" data-del="${r.RequestID}">${icon('trash')}ลบ</button></td>
       </tr>`).join('') || `<tr><td colspan="8" class="empty">ไม่มีข้อมูล</td></tr>`}</tbody>`;
     $$('#rqTbl [data-edit]').forEach(b => b.onclick = () => repairForm(b.dataset.edit, refresh));
     $$('#rqTbl [data-del]').forEach(b => b.onclick = async () => {
@@ -451,7 +489,7 @@ async function repairForm(id, refresh) {
     ${field('หมายเหตุ', `<textarea id="rqRemark" rows="2">${escapeHtml(d.Remark || '')}</textarea>`, true)}
   </div>`;
   openModal(Number(id) ? 'แก้ไขใบแจ้งซ่อม ' + d.RequestNo : 'แจ้งซ่อมรถยนต์', body,
-    `<button class="btn ghost" data-close>ยกเลิก</button><button class="btn" id="rqSave">บันทึก</button>`);
+    `<button class="btn ghost" data-close>ยกเลิก</button><button class="btn" id="rqSave">${icon('check')}บันทึก</button>`);
   $('#rqSave').onclick = async () => {
     const p = {
       RequestID: d.RequestID || 0, VehicleID: val('rqfVeh'), Severity: val('Severity'),
@@ -469,18 +507,20 @@ async function repairForm(id, refresh) {
 /* ============================================================
  * เมนู 4 — บันทึกการซ่อม/บำรุง
  * ============================================================ */
-async function screenLog(main) {
+async function screenLog(main, seq) {
   await loadVehicles();
+  if (stale(seq)) return;
   main.innerHTML = `
     <div class="filters">
       <div class="f"><label>ค้นหา</label><input id="lgSearch" placeholder="เลขที่/งาน/ผู้ให้บริการ"></div>
       <div class="f"><label>รถ</label>${vehicleSelect('lgVeh', '')}</div>
       <div class="f"><label>สถานะ</label><select id="lgStatus"><option value="">ทั้งหมด</option><option>เสร็จสิ้น</option><option>กำลังดำเนินการ</option><option>ยกเลิก</option></select></div>
-      <button class="btn ghost" id="lgFilter">กรอง</button>
-      <div style="flex:1"></div><button class="btn" id="lgAdd">+ บันทึกงาน</button>
+      <button class="btn ghost" id="lgFilter">${icon('filter')}กรอง</button>
+      <div style="flex:1"></div><button class="btn" id="lgAdd">${icon('plus')}บันทึกงาน</button>
     </div>
     <div class="panel"><div class="tbl-wrap"><table id="lgTbl"></table></div></div>`;
   const draw = list => {
+    if (stale(seq)) return;
     $('#lgTbl').innerHTML = `
       <thead><tr><th>เลขที่</th><th>วันที่</th><th>ทะเบียน</th><th>ประเภท</th><th>งาน</th>
         <th class="right">ค่าแรง</th><th class="right">ค่าอะไหล่</th><th class="right">รวม</th><th>สถานะ</th><th></th></tr></thead>
@@ -490,8 +530,8 @@ async function screenLog(main) {
         <td>${escapeHtml((r.WorkDescription || '').slice(0, 30))}</td>
         <td class="right">${money(r.LaborCost)}</td><td class="right">${money(r.PartsCost)}</td>
         <td class="right"><b>${money(r.TotalCost)}</b></td><td>${statusBadge(r.Status)}</td>
-        <td><button class="btn sm ghost" data-edit="${r.LogID}">แก้ไข</button>
-            <button class="btn sm danger" data-del="${r.LogID}">ลบ</button></td>
+        <td><button class="btn sm ghost" data-edit="${r.LogID}">${icon('pencil')}แก้ไข</button>
+            <button class="btn sm danger" data-del="${r.LogID}">${icon('trash')}ลบ</button></td>
       </tr>`).join('') || `<tr><td colspan="10" class="empty">ไม่มีข้อมูล</td></tr>`}</tbody>`;
     $$('#lgTbl [data-edit]').forEach(b => b.onclick = () => logForm(b.dataset.edit, refresh));
     $$('#lgTbl [data-del]').forEach(b => b.onclick = async () => {
@@ -546,7 +586,7 @@ async function logForm(id, refresh) {
   </div>
   <div class="section" id="receiptSec"></div>`;
   openModal(Number(id) ? 'แก้ไขใบงาน ' + d.LogNo : 'บันทึกการซ่อม/บำรุง', body,
-    `<button class="btn ghost" data-close>ยกเลิก</button><button class="btn" id="lgSave">บันทึก</button>`, { wide: true });
+    `<button class="btn ghost" data-close>ยกเลิก</button><button class="btn" id="lgSave">${icon('check')}บันทึก</button>`, { wide: true });
 
   const liBody = $('#liBody');
   $('#liAdd').onclick = () => { liBody.insertAdjacentHTML('beforeend', itemRow()); logRecalc(); };
@@ -601,9 +641,9 @@ async function renderReceipts(logId) {
   const list = await API.callOrThrow('log.getReceipts', { logId });
   sec.innerHTML = `<h4>ไฟล์แนบใบเสร็จ</h4>
     <div id="rcList">${list.map(f => `<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
-      <span>📎 ${escapeHtml(f.FileName)} (${num(Math.round(f.FileSize / 1024))} KB)</span>
+      <span>${icon('paperclip')} ${escapeHtml(f.FileName)} (${num(Math.round(f.FileSize / 1024))} KB)</span>
       <button class="btn sm ghost" data-dl='${escapeHtml(JSON.stringify(f))}'>ดาวน์โหลด</button>
-      <button class="btn sm danger" data-rcdel="${f.ReceiptID}">ลบ</button>
+      <button class="btn sm danger" data-rcdel="${f.ReceiptID}">${icon('trash')}ลบ</button>
     </div>`).join('') || '<span style="color:#6b7280;font-size:13px">ยังไม่มีไฟล์</span>'}</div>
     <input type="file" id="rcFile" multiple style="margin-top:8px">
     <button class="btn sm" id="rcUpload">อัปโหลด</button>`;
@@ -648,24 +688,26 @@ async function downloadReceipt(f) {
 /* ============================================================
  * เมนู 5 — ประวัติการซ่อม
  * ============================================================ */
-async function screenHistory(main) {
+async function screenHistory(main, seq) {
   await loadVehicles();
+  if (stale(seq)) return;
   main.innerHTML = `
     <div class="filters">
       <div class="f"><label>รถ</label>${vehicleSelect('hsVeh', '')}</div>
       <div class="f"><label>ตั้งแต่</label>${dateInp('hsFrom', '')}</div>
       <div class="f"><label>ถึง</label>${dateInp('hsTo', '')}</div>
       <div class="f"><label>ประเภท</label><select id="hsType"><option value="">ทั้งหมด</option><option>ซ่อม</option><option>บำรุงรักษา</option><option>เปลี่ยนน้ำมัน</option><option>ตรวจเช็ค</option></select></div>
-      <button class="btn ghost" id="hsFilter">กรอง</button>
+      <button class="btn ghost" id="hsFilter">${icon('filter')}กรอง</button>
     </div>
-    <div class="panel" style="margin-bottom:16px"><div class="head"><h3>สรุปค่าใช้จ่ายต่อคัน</h3></div><div class="tbl-wrap"><table id="hsSum"></table></div></div>
-    <div class="panel"><div class="head"><h3>รายการประวัติ</h3></div><div class="tbl-wrap"><table id="hsTbl"></table></div></div>`;
+    <div class="panel" style="margin-bottom:16px"><div class="head"><h3>${icon('chart')}สรุปค่าใช้จ่ายต่อคัน</h3></div><div class="tbl-wrap"><table id="hsSum"></table></div></div>
+    <div class="panel"><div class="head"><h3>${icon('list')}รายการประวัติ</h3></div><div class="tbl-wrap"><table id="hsTbl"></table></div></div>`;
   const refresh = async () => {
     const params = { vehicleId: val('hsVeh'), dateFrom: val('hsFrom'), dateTo: val('hsTo'), maintenanceType: val('hsType') };
     const [list, sum] = await Promise.all([
       API.callOrThrow('history.list', params),
       API.callOrThrow('history.summary', { dateFrom: val('hsFrom'), dateTo: val('hsTo') })
     ]);
+    if (stale(seq)) return;
     $('#hsSum').innerHTML = `<thead><tr><th>ทะเบียน</th><th>ยี่ห้อ/รุ่น</th><th class="right">จำนวนครั้ง</th><th class="right">ค่าแรง</th><th class="right">ค่าอะไหล่</th><th class="right">รวม</th></tr></thead>
       <tbody>${sum.map(s => `<tr><td>${escapeHtml(s.licensePlate)}</td><td>${escapeHtml(s.brand)} ${escapeHtml(s.model)}</td>
         <td class="right">${s.count}</td><td class="right">${money(s.laborCost)}</td><td class="right">${money(s.partsCost)}</td><td class="right"><b>${money(s.totalCost)}</b></td></tr>`).join('') || `<tr><td colspan="6" class="empty">ไม่มีข้อมูล</td></tr>`}</tbody>`;
@@ -702,8 +744,9 @@ async function historyDetail(logId) {
 /* ============================================================
  * เมนู 6 — บันทึกเลขไมล์ (กริดรายเดือน)
  * ============================================================ */
-async function screenMileage(main) {
+async function screenMileage(main, seq) {
   await loadVehicles();
+  if (stale(seq)) return;
   const now = new Date();
   main.innerHTML = `
     <div class="filters">
@@ -711,10 +754,10 @@ async function screenMileage(main) {
       <div class="f"><label>ปี</label><input id="mlYear" type="number" value="${now.getFullYear()}" style="width:90px"></div>
       <div class="f"><label>เดือน</label><select id="mlMonth">${Array.from({ length: 12 }, (_, i) =>
         `<option value="${i + 1}" ${i === now.getMonth() ? 'selected' : ''}>${i + 1}</option>`).join('')}</select></div>
-      <button class="btn ghost" id="mlLoad">โหลด</button>
+      <button class="btn ghost" id="mlLoad">${icon('play')}โหลด</button>
     </div>
     <div class="cards" id="mlCards"></div>
-    <div class="panel"><div class="head"><h3>กรอกเลขไมล์รายวัน</h3><button class="btn" id="mlSave">บันทึกทั้งเดือน</button></div>
+    <div class="panel"><div class="head"><h3>${icon('grid')}กรอกเลขไมล์รายวัน</h3><button class="btn" id="mlSave">${icon('check')}บันทึกทั้งเดือน</button></div>
       <div style="padding:16px"><div class="mgrid" id="mlGrid"><div class="empty">เลือกรถแล้วกดโหลด</div></div></div>
     </div>`;
 
@@ -722,10 +765,11 @@ async function screenMileage(main) {
     const vid = val('mlVeh');
     if (!vid) return toast('เลือกรถก่อน', 'err');
     const r = await API.callOrThrow('mileage.getMonth', { vehicleId: vid, year: val('mlYear'), month: val('mlMonth') });
+    if (stale(seq)) return;
     $('#mlCards').innerHTML = `
-      <div class="card"><div class="label">รถ</div><div class="val" style="font-size:16px">${escapeHtml(r.vehicle.licensePlate)}</div></div>
-      <div class="card"><div class="label">เลขไมล์ปัจจุบัน</div><div class="val">${num(r.vehicle.currentMileage)}</div></div>
-      <div class="card"><div class="label">ระยะทางเดือนนี้ (กม.)</div><div class="val">${num(r.monthlyKm)}</div></div>`;
+      <div class="card"><div class="cwrap"><div class="kico">${icon('car', 19)}</div><div><div class="label">รถ</div><div class="val" style="font-size:16px">${escapeHtml(r.vehicle.licensePlate)}</div></div></div></div>
+      <div class="card"><div class="cwrap"><div class="kico">${icon('gauge', 19)}</div><div><div class="label">เลขไมล์ปัจจุบัน</div><div class="val">${num(r.vehicle.currentMileage)}</div></div></div></div>
+      <div class="card"><div class="cwrap"><div class="kico">${icon('chart', 19)}</div><div><div class="label">ระยะทางเดือนนี้ (กม.)</div><div class="val">${num(r.monthlyKm)}</div></div></div></div>`;
     const grid = $('#mlGrid'); grid.innerHTML = '';
     const dow = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
     for (let day = 1; day <= r.daysInMonth; day++) {
