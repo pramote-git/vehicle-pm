@@ -1,0 +1,16 @@
+# wrangler.toml — คอนฟิก Cloudflare Pages + Functions สำหรับ Vehicle PM
+# static: docs/  ·  API: functions/api.js  ·  DB: D1  ·  ไฟล์แนบ: R2
+name = "vehicle-pm"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "docs"
+
+# ฐานข้อมูล D1 — แทน database_id ด้วยค่าจริงหลังรัน `wrangler d1 create vehicle-pm-db`
+[[d1_databases]]
+binding = "DB"
+database_name = "vehicle-pm-db"
+database_id = "REPLACE_WITH_REAL_ID_AFTER_CREATE"
+
+# ที่เก็บไฟล์แนบใบเสร็จ (แบบ S3)
+[[r2_buckets]]
+binding = "RECEIPTS"
+bucket_name = "vehicle-pm-receipts"

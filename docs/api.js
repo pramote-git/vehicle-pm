@@ -17,13 +17,22 @@ const API = (() => {
     document.body.classList.toggle('busy', on);
   }
 
+  // resolve endpoint อัตโนมัติตาม host:
+  //  - เปิดจาก GitHub Pages (github.io) → ใช้ URL เต็มใน config (GAS backend เดิม)
+  //  - เปิดจากที่อื่น (Cloudflare Pages / custom domain / localhost) → same-origin '/api' (Worker + D1)
+  function endpoint() {
+    const u = (window.PK_CONFIG && PK_CONFIG.API_URL) || '';
+    if (!u || u[0] === '/') return u || '/api';
+    return /github\.io$/i.test(location.hostname) ? u : '/api';
+  }
+
   function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
   function setToken(t) { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); }
   function getUser() { try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch { return null; } }
   function setUser(u) { u ? localStorage.setItem(USER_KEY, JSON.stringify(u)) : localStorage.removeItem(USER_KEY); }
 
   async function call(action, params = {}) {
-    if (!window.PK_CONFIG || PK_CONFIG.API_URL.indexOf('PASTE_YOUR') === 0) {
+    if (endpoint().indexOf('PASTE_YOUR') >= 0) {
       throw new Error('ยังไม่ได้ตั้งค่า API_URL ใน config.js');
     }
     const body = Object.assign({ action, token: getToken() }, params);
@@ -31,7 +40,7 @@ const API = (() => {
     try {
       let res;
       try {
-        res = await fetch(PK_CONFIG.API_URL, {
+        res = await fetch(endpoint(), {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(body),
@@ -68,5 +77,5 @@ const API = (() => {
   async function logout() { try { await call('logout', {}); } catch {} logoutLocal(); }
   function logoutLocal() { setToken(''); setUser(null); }
 
-  return { call, callOrThrow, login, logout, logoutLocal, getToken, getUser, setUser };
+  return { call, callOrThrow, login, logout, logoutLocal, getToken, getUser, setUser, endpoint };
 })();

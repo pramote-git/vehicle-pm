@@ -630,7 +630,7 @@ function fileToB64(file) {
 }
 async function downloadReceipt(f) {
   try {
-    const res = await fetch(PK_CONFIG.API_URL, {
+    const res = await fetch(API.endpoint(), {
       method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'log.downloadReceipt', id: f.ReceiptID, token: API.getToken() })
     });
