@@ -10,7 +10,8 @@ binding = "DB"
 database_name = "vehicle-pm-db"
 database_id = "REPLACE_WITH_REAL_ID_AFTER_CREATE"
 
-# ที่เก็บไฟล์แนบใบเสร็จ (แบบ S3)
-[[r2_buckets]]
-binding = "RECEIPTS"
-bucket_name = "vehicle-pm-receipts"
+# ที่เก็บไฟล์แนบใบเสร็จ (แบบ S3) — เปิดใช้ทีหลัง (ต้องเปิด R2 ใน dashboard ก่อน)
+# หลังรัน `wrangler r2 bucket create vehicle-pm-receipts` แล้วค่อยเอา 3 บรรทัดล่างออกจากคอมเมนต์
+# [[r2_buckets]]
+# binding = "RECEIPTS"
+# bucket_name = "vehicle-pm-receipts"

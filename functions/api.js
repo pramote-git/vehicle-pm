@@ -699,6 +699,7 @@ async function Log_getReceipts(env, p, sess) {
 }
 async function Log_uploadReceipt(env, p, sess) {
   requireScreen(sess, 'pk_vehicle_log');
+  if (!env.RECEIPTS) return fail('ระบบไฟล์แนบยังไม่เปิดใช้งาน (ต้องเปิด R2 ก่อน)');
   const logId = asInt(p.logId);
   if (logId <= 0) return fail('กรุณาบันทึกใบงานก่อนแนบไฟล์');
   const files = Array.isArray(p.files) ? p.files : [];
@@ -720,7 +721,7 @@ async function Log_downloadReceipt(env, p, sess) {
   requireRead(sess);
   const rec = await dbFindBy(env, 'Receipts', 'ReceiptID', asInt(p.id));
   const errJson = () => new Response('{"success":false,"error":"ไม่พบไฟล์"}', { headers: { 'Content-Type': 'application/json;charset=utf-8' } });
-  if (!rec || !asBool(rec.IsActive) || asStr(rec.Module) !== FILE_MODULE) return errJson();
+  if (!env.RECEIPTS || !rec || !asBool(rec.IsActive) || asStr(rec.Module) !== FILE_MODULE) return errJson();
   const obj = await env.RECEIPTS.get(asStr(rec.StorageKey));
   if (!obj) return errJson();
   const b64 = base64FromBuffer(await obj.arrayBuffer());
@@ -730,7 +731,7 @@ async function Log_deleteReceipt(env, p, sess) {
   requireScreen(sess, 'pk_vehicle_log');
   const rec = await dbFindBy(env, 'Receipts', 'ReceiptID', asInt(p.id));
   if (!rec || !asBool(rec.IsActive) || asStr(rec.Module) !== FILE_MODULE) return fail('ไม่พบไฟล์');
-  try { await env.RECEIPTS.delete(asStr(rec.StorageKey)); } catch (e) {}
+  try { if (env.RECEIPTS) await env.RECEIPTS.delete(asStr(rec.StorageKey)); } catch (e) {}
   await dbSoftDelete(env, 'Receipts', rec, sess.empId);
   return ok({});
 }
